@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COOL EYEWEAR - Tienda Oficial</title>
+    
+    <!-- Fuentes Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configuración Tailwind personalizada -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        brand: ['Rajdhani', 'sans-serif'],
+                    },
+                    colors: {
+                        gold: '#D4AF37',
+                        'gold-bright': '#F5C518',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Estilos CSS Extra -->
+    <style>
+        body { background-color: #FFFFFF; color: #000000; }
+        .brand-font { font-family: 'Rajdhani', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+
+    <!-- React & ReactDOM (Producción) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+        
+        // --- CONFIGURACIÓN DE CONEXIÓN ---
+        const USE_API = false; 
+        const API_URL = 'http://localhost/coolstore/api.php'; 
+
+        // --- SISTEMA DE ÍCONOS NATIVO ---
+        const IconBase = ({ size = 24, children, ...props }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>{children}</svg>
+        );
+        
+        const Icons = {
+            ShoppingCart: (p) => <IconBase {...p}><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></IconBase>,
+            Search: (p) => <IconBase {...p}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></IconBase>,
+            Menu: (p) => <IconBase {...p}><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></IconBase>,
+            X: (p) => <IconBase {...p}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></IconBase>,
+            ArrowRight: (p) => <IconBase {...p}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></IconBase>,
+            Star: (p) => <IconBase {...p}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></IconBase>,
+            Heart: (p) => <IconBase {...p}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></IconBase>,
+            Instagram: (p) => <IconBase {...p}><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></IconBase>,
+            Facebook: (p) => <IconBase {...p}><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></IconBase>,
+            Twitter: (p) => <IconBase {...p}><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></IconBase>,
+            ChevronDown: (p) => <IconBase {...p}><path d="m6 9 6 6 6-6"/></IconBase>,
+            Filter: (p) => <IconBase {...p}><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></IconBase>,
+            Check: (p) => <IconBase {...p}><path d="M20 6 9 17l-5-5"/></IconBase>,
+            Settings: (p) => <IconBase {...p}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></IconBase>,
+            User: (p) => <IconBase {...p}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></IconBase>,
+            MapPin: (p) => <IconBase {...p}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></IconBase>,
+            CreditCard: (p) => <IconBase {...p}><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></IconBase>,
+            Truck: (p) => <IconBase {...p}><path d="M10 17h4V5H2v12h3"/><path d="M20 17h2v-3.34a4 4 0 0 0-1.17-2.83L19 9h-5"/><path d="M14 17h1"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></IconBase>,
+            MessageCircle: (p) => <IconBase {...p}><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></IconBase>,
+            LogOut: (p) => <IconBase {...p}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></IconBase>,
+            ArrowLeft: (p) => <IconBase {...p}><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></IconBase>,
+            Plus: (p) => <IconBase {...p}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></IconBase>,
+            Edit: (p) => <IconBase {...p}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></IconBase>,
+            Trash: (p) => <IconBase {...p}><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></IconBase>,
+            Image: (p) => <IconBase {...p}><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></IconBase>,
+            Lock: (p) => <IconBase {...p}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></IconBase>
+        };
+
+        const { ShoppingCart, Search, Menu, X, ArrowRight, Star, Heart, Instagram, Facebook, Twitter, ChevronDown, Filter, Check, Settings, User, MapPin, CreditCard, Truck, MessageCircle, LogOut, ArrowLeft, Plus, Edit, Trash, Image, Lock } = Icons;
+
+        const CONFIG = { shippingCost: 150, freeShippingThreshold: 1500, wholesaleMinQty: 6 };
+        const CATEGORIAS_LIST = ["Gafas y Lentes", "Joyería", "Bolsas y Mochilas", "Calzado"];
+
+        // --- DATOS MOCK (FALLBACK PARA DEMO) ---
+        const PRODUCTOS_INICIALES = [
+            { id: 101, nombre: "AVIATOR NEON", marca: "RAY-BAN", categoria: "Gafas y Lentes", genero: "Unisex", precio: 2500, precioMayorista: 1800, descuento: 0, stock: 15, descripcion: "El clásico reinventado.", variantes: [{ color: "Dorado", mica: "Verde G-15", img: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=600&q=80" }], tallas: ["ESTÁNDAR", "GRANDE"], tipo: "gafas" },
+            { id: 401, nombre: "AIR FORCE 1 '07", marca: "NIKE", categoria: "Calzado", genero: "Hombre", precio: 2800, precioMayorista: 2200, descuento: 0, stock: 8, descripcion: "Leyenda urbana.", variantes: [{ color: "Blanco", img: "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=600&q=80" }], tallas: ["26", "27", "28", "29"], tipo: "general" }
+        ];
+
+        // --- APP ---
+        function App() {
+            const [view, setView] = useState('home');
+            const [selectedProduct, setSelectedProduct] = useState(null);
+            const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+            const [isMenuOpen, setIsMenuOpen] = useState(false);
+            const [notification, setNotification] = useState(null);
+            const [activeFilters, setActiveFilters] = useState({ categoria: "Todas", genero: "Todos", precioMax: 10000 });
+
+            // Data State
+            const [carrito, setCarrito] = useState(() => { const s = localStorage.getItem('cart_cool_functional'); return s ? JSON.parse(s) : []; });
+            const [products, setProducts] = useState(() => {
+                 const s = localStorage.getItem('db_products_functional'); 
+                 return s ? JSON.parse(s) : PRODUCTOS_INICIALES;
+            });
+            const [orders, setOrders] = useState(() => {
+                 const s = localStorage.getItem('db_orders_functional');
+                 return s ? JSON.parse(s) : [];
+            });
+
+            // INIT DATA
+            useEffect(() => {
+                if (USE_API) {
+                    console.log("📡 Conectando a MySQL Backend...");
+                    fetch(`${API_URL}?action=products`)
+                        .then(res => res.json())
+                        .then(data => {
+                            console.log("✅ Productos cargados desde DB:", data.length);
+                            setProducts(data);
+                        })
+                        .catch(err => {
+                            console.error("❌ Error de conexión:", err);
+                            showNotification("Error conectando a BD. Usando modo offline.");
+                        });
+                } else {
+                    console.log("🔌 Modo Local (Offline) Activo");
+                }
+            }, []);
+
+            // PERSISTENCE (Solo en modo offline/demo)
+            useEffect(() => { if (!USE_API) localStorage.setItem('cart_cool_functional', JSON.stringify(carrito)); }, [carrito]);
+            useEffect(() => { if (!USE_API) localStorage.setItem('db_products_functional', JSON.stringify(products)); }, [products]);
+            useEffect(() => { if (!USE_API) localStorage.setItem('db_orders_functional', JSON.stringify(orders)); }, [orders]);
+
+            const showNotification = (msg) => { 
+                console.log("🔔 Notificación:", msg);
+                setNotification(msg); 
+                setTimeout(() => setNotification(null), 3000); 
+            };
+
+            const addToCart = (product, variante, talla, cantidad) => {
+                console.log(`🛒 Intentando agregar: ${product.nombre} (x${cantidad})`);
+                if (cantidad > product.stock) { showNotification("¡Stock insuficiente!"); return; }
+                setCarrito(prev => {
+                    const key = `${product.id}-${variante.color}-${talla}`;
+                    const existing = prev.find(p => p.key === key);
+                    if (existing) {
+                        if (existing.cantidad + cantidad > product.stock) return prev;
+                        return prev.map(p => p.key === key ? { ...p, cantidad: p.cantidad + cantidad } : p);
+                    }
+                    return [...prev, { ...product, variante, talla, cantidad, key }];
+                });
+                showNotification(`AGREGADO: ${product.nombre}`);
+            };
+
+            const handlePlaceOrder = async (orderData) => {
+                console.log("🚀 Iniciando Checkout...", orderData);
+                
+                if (USE_API) {
+                    // --- MODO PRODUCCIÓN (MySQL) ---
+                    try {
+                        const res = await fetch(`${API_URL}?action=create_order`, {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ ...orderData, items: carrito })
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            setCarrito([]);
+                            showNotification("¡Pedido guardado en MySQL!");
+                            console.log("✅ Pedido MySQL Éxito:", data);
+                            setView('success');
+                        } else {
+                            console.error("❌ Error MySQL:", data.error);
+                            showNotification("Error del servidor: " + data.error);
+                        }
+                    } catch (e) {
+                        console.error("❌ Error Fetch:", e);
+                        showNotification("Error de conexión");
+                    }
+                } else {
+                    // --- MODO DEMO (LocalStorage) ---
+                    const newOrder = {
+                        id: `#ORD-${Math.floor(10000 + Math.random() * 90000)}`,
+                        cliente: orderData.shipping.nombre,
+                        total: orderData.total,
+                        estatus: "pendiente",
+                        metodoPago: orderData.paymentMethod,
+                        items: carrito
+                    };
+                    const newProductsState = products.map(prod => {
+                        const itemsInCart = carrito.filter(item => item.id === prod.id);
+                        if (itemsInCart.length > 0) {
+                            const bought = itemsInCart.reduce((s, i) => s + i.cantidad, 0);
+                            return { ...prod, stock: Math.max(0, prod.stock - bought) };
+                        }
+                        return prod;
+                    });
+                    setProducts(newProductsState);
+                    setOrders([newOrder, ...orders]);
+                    setCarrito([]);
+                    console.log("💾 Pedido Local Guardado:", newOrder);
+                    showNotification("Pedido guardado (Local)");
+                    setView('success');
+                }
+            };
+
+            return (
+                <div className="min-h-screen flex flex-col selection:bg-gold selection:text-black">
+                    {/* ANNOUNCEMENT */}
+                    <div className="bg-black text-gold text-xs font-bold py-2.5 text-center tracking-widest px-4 flex justify-center gap-4">
+                        <span>🔥 ENVÍOS GRATIS +$1,500</span> <span>//</span> <span>⚡️ 3 MSI CON TARJETA</span>
+                    </div>
+
+                    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
+                        <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between">
+                            <button onClick={() => setIsMenuOpen(true)} className="lg:hidden p-2 text-black hover:text-gold transition-colors"><Menu size={24} /></button>
+                            <div onClick={() => setView('home')} className="cursor-pointer flex items-center gap-2 group">
+                                <div className="w-8 h-8 bg-black flex items-center justify-center rounded-sm"><div className="w-4 h-4 border-2 border-gold rounded-full"></div></div>
+                                <span className="text-2xl font-bold tracking-[0.1em] text-black group-hover:opacity-80 transition-opacity brand-font">COOL<span className="text-gold">EYEWEAR</span></span>
+                            </div>
+                            <div className="hidden lg:flex items-center gap-10 text-xs font-bold uppercase tracking-[0.15em] text-gray-500">
+                                {CATEGORIAS_LIST.map(cat => (
+                                    <button key={cat} onClick={() => { setActiveFilters({...activeFilters, categoria: cat}); setView('home'); }} className="hover:text-black hover:scale-105 transition-all relative group py-2">
+                                        {cat}<span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all group-hover:w-full"></span>
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="flex items-center gap-6 text-black">
+                                <button onClick={() => setView('cart')} className="hover:text-gold transition-colors relative group p-1">
+                                    <ShoppingCart size={22} />
+                                    {carrito.reduce((a,c)=>a+c.cantidad,0) > 0 && <span className="absolute -top-1 -right-1 bg-black text-gold text-[9px] w-4 h-4 flex items-center justify-center font-bold rounded-full border border-white">{carrito.reduce((a,c)=>a+c.cantidad,0)}</span>}
+                                </button>
+                            </div>
+                        </div>
+                    </nav>
+
+                    {/* MAIN CONTENT SWITCHER */}
+                    <main className="flex-1 w-full bg-white">
+                        {view === 'home' && (
+                            <>
+                                <HeroSection />
+                                <div className="max-w-[1440px] mx-auto px-6 py-16 flex flex-col md:flex-row gap-12">
+                                    <aside className="hidden md:block w-64 shrink-0 pr-8 border-r border-gray-100">
+                                        <FiltersSidebar activeFilters={activeFilters} setActiveFilters={setActiveFilters} />
+                                    </aside>
+                                    <div className="flex-1">
+                                        <ProductGrid products={products} filters={activeFilters} onProductClick={(p) => { setSelectedProduct(p); setView('detail'); window.scrollTo(0,0); }} />
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                        {view === 'detail' && selectedProduct && <ProductDetail product={products.find(p => p.id === selectedProduct.id) || selectedProduct} onBack={() => setView('home')} onAddToCart={addToCart} />}
+                        {view === 'cart' && <CartPage cart={carrito} setCarrito={setCarrito} onCheckout={() => setView('checkout')} onContinue={() => setView('home')} />}
+                        {view === 'checkout' && <CheckoutFlow cart={carrito} onBack={() => setView('cart')} onPlaceOrder={handlePlaceOrder} />}
+                        {view === 'success' && <OrderSuccess onHome={() => setView('home')} />}
+                        {view === 'admin' && (isAdminAuthenticated ? <AdminPanel orders={orders} setOrders={setOrders} products={products} setProducts={setProducts} /> : <LoginAdmin onLoginSuccess={() => { console.log("🔑 Admin Logged In"); setIsAdminAuthenticated(true); }} />)}
+                    </main>
+
+                    <Footer onAdminClick={() => setView('admin')} />
+                    
+                    {notification && <div className="fixed top-24 right-6 z-[70] bg-black text-gold border border-gold px-8 py-4 shadow-2xl flex items-center gap-4 animate-fade-in"><div className="w-2 h-2 bg-gold rounded-full animate-pulse"></div><span className="font-bold text-xs tracking-widest uppercase">{notification}</span></div>}
+                </div>
+            );
+        }
+
+        // --- SUB COMPONENTS (Simplificados visualmente, lógica intacta) ---
+        function HeroSection() {
+            return (
+                <div className="relative w-full h-[70vh] bg-gray-50 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1920&q=80" className="absolute inset-0 w-full h-full object-cover" alt="Hero" />
+                    <div className="absolute inset-0 bg-white/10 mix-blend-overlay"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                    <div className="absolute inset-0 flex flex-col justify-center items-center text-center p-6 z-10">
+                        <span className="bg-gold text-black px-6 py-2 text-xs font-bold uppercase tracking-[0.3em] mb-8 shadow-[0_0_20px_rgba(212,175,55,0.6)] animate-pulse">Nueva Colección 2026</span>
+                        <h1 className="text-6xl md:text-9xl font-bold text-white uppercase tracking-tighter mb-8 brand-font drop-shadow-2xl">ERA<br/><span className="text-gold">DORADA</span></h1>
+                        <button className="bg-white text-black border-2 border-white px-12 py-4 text-xs font-bold uppercase tracking-[0.2em] hover:bg-black hover:text-gold hover:border-black transition-all duration-300 shadow-xl">Comprar Ahora</button>
+                    </div>
+                </div>
+            );
+        }
+
+        function FiltersSidebar({ activeFilters, setActiveFilters }) {
+            return (
+                <div className="space-y-12 sticky top-28">
+                    <div>
+                        <h3 className="font-bold text-xs uppercase tracking-[0.2em] mb-6 text-gold border-b border-gray-100 pb-2">Colecciones</h3>
+                        <ul className="space-y-4 text-xs font-bold uppercase tracking-widest text-gray-400">
+                            <li className={`cursor-pointer transition-all hover:text-black hover:pl-2 ${activeFilters.categoria === 'Todas' ? 'text-black pl-2 border-l-2 border-gold' : ''}`} onClick={() => setActiveFilters({...activeFilters, categoria: 'Todas'})}>Todas</li>
+                            {CATEGORIAS_LIST.map(cat => (
+                                <li key={cat} className={`cursor-pointer transition-all hover:text-black hover:pl-2 ${activeFilters.categoria === cat ? 'text-black pl-2 border-l-2 border-gold' : ''}`} onClick={() => setActiveFilters({...activeFilters, categoria: cat})}>{cat}</li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            );
+        }
+
+        function ProductGrid({ products, filters, onProductClick }) {
+            const filtered = products.filter(p => (filters.categoria === "Todas" || p.categoria === filters.categoria) && (filters.genero === "Todos" || p.genero === filters.genero));
+            if (filtered.length === 0) return <div className="text-center py-20 text-gray-400 font-bold uppercase tracking-widest text-xs">No hay resultados.</div>;
+            return <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-16">{filtered.map(p => <ProductCard key={p.id} product={p} onClick={onProductClick} />)}</div>;
+        }
+
+        function ProductCard({ product, onClick }) {
+            const [idx, setIdx] = useState(0);
+            const img = product.variantes && product.variantes[idx] ? product.variantes[idx].img : 'https://via.placeholder.com/300';
+            return (
+                <div className="group flex flex-col cursor-pointer" onClick={() => onClick(product)}>
+                    <div className="relative aspect-[3/4] bg-[#F5F5F5] mb-5 overflow-hidden group-hover:border-gold border border-transparent transition-all">
+                        <img src={img} className="w-full h-full object-cover mix-blend-multiply opacity-90 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"/>
+                        {product.stock===0 && <div className="absolute inset-0 bg-white/80 flex items-center justify-center"><span className="text-black border-2 border-black px-4 py-2 text-xs font-bold uppercase tracking-[0.2em]">Agotado</span></div>}
+                    </div>
+                    <h3 className="text-black text-sm font-bold uppercase tracking-[0.05em] mb-1 group-hover:text-gold transition-colors brand-font">{product.nombre}</h3>
+                    <p className="text-[10px] text-gray-400 mb-2 uppercase tracking-widest font-bold">{product.marca}</p>
+                    <span className="text-sm font-bold text-black">${product.precio}</span>
+                </div>
+            )
+        }
+
+        function ProductDetail({ product, onBack, onAddToCart }) {
+            const [idx, setIdx] = useState(0);
+            const variant = product.variantes ? product.variantes[idx] : { img: '', color: '' };
+            return (
+                <div className="max-w-[1000px] mx-auto px-6 py-12 grid md:grid-cols-2 gap-12 animate-fade-in">
+                    <div className="aspect-[3/4] bg-[#F5F5F5]"><img src={variant.img} className="w-full h-full object-cover mix-blend-multiply"/></div>
+                    <div>
+                        <button onClick={onBack} className="text-xs font-bold uppercase mb-6 flex items-center gap-2 hover:text-gold"><ArrowLeft size={14}/> Volver</button>
+                        <h1 className="text-4xl font-black uppercase mb-4 brand-font">{product.nombre}</h1>
+                        <p className="text-2xl font-bold mb-6">${product.precio}</p>
+                        <p className="text-gray-500 mb-8">{product.descripcion}</p>
+                        <div className="mb-8">
+                            <label className="text-xs font-bold uppercase block mb-2">Color: {variant.color}</label>
+                            <div className="flex gap-2">
+                                {product.variantes && product.variantes.map((v, i) => (
+                                    <button key={i} onClick={()=>setIdx(i)} className={`w-12 h-12 border ${idx===i?'border-gold':'border-gray-200'}`}><img src={v.img} className="w-full h-full object-cover"/></button>
+                                ))}
+                            </div>
+                        </div>
+                        <button onClick={()=>onAddToCart(product, variant, "STD", 1)} disabled={product.stock===0} className="w-full bg-gold text-black font-bold py-4 hover:bg-black hover:text-white transition-colors uppercase disabled:bg-gray-300">
+                            {product.stock===0 ? "Agotado" : "Agregar al Carrito"}
+                        </button>
+                    </div>
+                </div>
+            )
+        }
+
+        function CartPage({ cart, setCarrito, onCheckout, onContinue }) {
+            const total = cart.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+            if (cart.length === 0) return <div className="text-center py-20"><h2 className="text-2xl font-bold uppercase mb-4">Carrito Vacío</h2><button onClick={onContinue} className="border-b-2 border-gold font-bold">Ir a Comprar</button></div>;
+            return (
+                <div className="max-w-[1000px] mx-auto px-6 py-12 grid md:grid-cols-3 gap-12">
+                    <div className="md:col-span-2 space-y-6">
+                        <h1 className="text-2xl font-bold uppercase mb-6">Tu Carrito</h1>
+                        {cart.map((item, i) => (
+                            <div key={i} className="flex gap-4 border-b pb-4">
+                                <div className="w-20 h-20 bg-gray-100"><img src={item.variante.img} className="w-full h-full object-cover"/></div>
+                                <div className="flex-1">
+                                    <h3 className="font-bold uppercase">{item.nombre}</h3>
+                                    <p className="text-xs text-gray-500">{item.variante.color}</p>
+                                    <div className="flex justify-between mt-2 font-bold"><span>${item.precio}</span><span>x{item.cantidad}</span></div>
+                                </div>
+                                <button onClick={()=>setCarrito(cart.filter((_,x)=>x!==i))}><X size={16}/></button>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="bg-black text-white p-6 h-fit shadow-xl">
+                        <h3 className="font-bold uppercase mb-4 text-gold">Resumen</h3>
+                        <div className="flex justify-between text-xl font-black mb-6"><span>Total</span><span>${total}</span></div>
+                        <button onClick={onCheckout} className="w-full bg-gold text-black font-bold py-3 uppercase hover:bg-white transition-colors">Pagar</button>
+                    </div>
+                </div>
+            )
+        }
+        
+        function CheckoutFlow({ cart, onBack, onPlaceOrder }) {
+             const [formData, setFormData] = useState({ nombre: '', email: '', direccion: '' });
+             const total = cart.reduce((acc, item) => acc + (item.precio * item.cantidad), 0) + CONFIG.shippingCost;
+             return (
+                 <div className="max-w-2xl mx-auto px-6 py-12">
+                     <button onClick={onBack} className="text-xs font-bold uppercase mb-8 flex items-center gap-2"><ArrowLeft size={14}/> Volver</button>
+                     <h1 className="text-3xl font-black uppercase mb-8">Checkout</h1>
+                     <div className="space-y-4">
+                         <input placeholder="Nombre Completo" className="w-full border p-3 font-bold" onChange={e=>setFormData({...formData, nombre: e.target.value})}/>
+                         <input placeholder="Email" className="w-full border p-3 font-bold" onChange={e=>setFormData({...formData, email: e.target.value})}/>
+                         <input placeholder="Dirección" className="w-full border p-3 font-bold" onChange={e=>setFormData({...formData, direccion: e.target.value})}/>
+                         <div className="bg-gray-50 p-6 mt-6 border border-gray-100">
+                             <h3 className="font-bold uppercase mb-4 text-gold">Método de Pago</h3>
+                             <div className="flex gap-4">
+                                <button onClick={()=>onPlaceOrder({shipping: formData, paymentMethod: 'card', total})} className="flex-1 bg-black text-white py-3 font-bold uppercase text-xs hover:bg-gold hover:text-black">Tarjeta</button>
+                                <button onClick={()=>onPlaceOrder({shipping: formData, paymentMethod: 'oxxo', total})} className="flex-1 border-2 border-black py-3 font-bold uppercase text-xs hover:bg-black hover:text-white">OXXO</button>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             )
+        }
+
+        function LoginAdmin({ onLoginSuccess }) {
+            const [pass, setPass] = useState('');
+            return (
+                <div className="min-h-[50vh] flex items-center justify-center animate-fade-in">
+                    <div className="text-center space-y-4 bg-white p-8 shadow-2xl border border-gray-100 rounded-xl">
+                        <Lock className="mx-auto text-gold" size={32} />
+                        <h2 className="font-black uppercase text-xl brand-font">Acceso Admin</h2>
+                        <input type="password" value={pass} onChange={e=>setPass(e.target.value)} className="border-2 border-gray-200 p-2 text-center font-bold outline-none focus:border-gold w-full rounded" placeholder="Contraseña"/>
+                        <button onClick={()=> pass==='admin123' ? onLoginSuccess() : alert('Contraseña Incorrecta')} className="block w-full bg-black text-white py-3 font-bold uppercase text-xs hover:bg-gold hover:text-black transition-colors rounded">Entrar</button>
+                    </div>
+                </div>
+            )
+        }
+
+        function ProductForm({ product, onSave, onCancel }) {
+            const [formData, setFormData] = useState({
+                nombre: '', marca: '', categoria: CATEGORIAS_LIST[0], genero: 'Unisex',
+                precio: 0, stock: 0, descripcion: '', imagen: '', color: '', tallas: ''
+            });
+
+            useEffect(() => {
+                if (product) {
+                    setFormData({
+                        ...product,
+                        imagen: product.variantes && product.variantes.length > 0 ? product.variantes[0].img : '',
+                        color: product.variantes && product.variantes.length > 0 ? product.variantes[0].color : '',
+                        tallas: product.tallas ? product.tallas.join(', ') : ''
+                    });
+                }
+            }, [product]);
+
+            const handleImageUpload = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    console.log("📤 Subiendo imagen:", file.name);
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        setFormData(prev => ({ ...prev, imagen: reader.result }));
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const newProduct = {
+                    ...product, ...formData,
+                    id: product ? product.id : Date.now(),
+                    tallas: formData.tallas.split(',').map(t => t.trim()),
+                    variantes: [{ color: formData.color, img: formData.imagen }] 
+                };
+                onSave(newProduct);
+            };
+
+            return (
+                <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-lg mb-8">
+                    <h2 className="text-2xl font-black uppercase mb-6 brand-font">{product ? 'Editar' : 'Nuevo'} Producto</h2>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <input required placeholder="Nombre" value={formData.nombre} onChange={e=>setFormData({...formData, nombre: e.target.value})} className="border p-2 rounded w-full font-bold" />
+                            <input required placeholder="Marca" value={formData.marca} onChange={e=>setFormData({...formData, marca: e.target.value})} className="border p-2 rounded w-full" />
+                        </div>
+                        <div className="grid grid-cols-3 gap-4">
+                            <input type="number" placeholder="Precio" value={formData.precio} onChange={e=>setFormData({...formData, precio: Number(e.target.value)})} className="border p-2 rounded w-full" />
+                            <input type="number" placeholder="Stock" value={formData.stock} onChange={e=>setFormData({...formData, stock: Number(e.target.value)})} className="border p-2 rounded w-full" />
+                            <select value={formData.categoria} onChange={e=>setFormData({...formData, categoria: e.target.value})} className="border p-2 rounded w-full">{CATEGORIAS_LIST.map(c=><option key={c} value={c}>{c}</option>)}</select>
+                        </div>
+                        <textarea placeholder="Descripción" value={formData.descripcion} onChange={e=>setFormData({...formData, descripcion: e.target.value})} className="border p-2 rounded w-full h-24"></textarea>
+                        
+                        <div className="bg-gray-50 p-4 rounded border border-gray-100">
+                            <label className="block text-xs font-bold text-gold uppercase mb-2">Imagen Principal</label>
+                            <div className="flex items-center gap-4">
+                                <label className="cursor-pointer bg-white border border-gray-300 px-4 py-2 rounded text-xs font-bold uppercase hover:border-gold hover:text-gold transition-colors flex items-center gap-2">
+                                    <Image size={16}/> Subir Foto
+                                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                </label>
+                                {formData.imagen ? <img src={formData.imagen} className="w-12 h-12 object-cover rounded border"/> : <span className="text-xs text-gray-400">Sin foto</span>}
+                            </div>
+                            <input placeholder="Color Principal (Ej: Negro)" value={formData.color} onChange={e=>setFormData({...formData, color: e.target.value})} className="border p-2 rounded w-full mt-3" />
+                        </div>
+
+                        <div className="flex gap-4 pt-4">
+                            <button type="button" onClick={onCancel} className="flex-1 py-3 border border-gray-300 font-bold uppercase rounded hover:bg-gray-100 text-xs">Cancelar</button>
+                            <button type="submit" className="flex-1 py-3 bg-gold text-black font-bold uppercase rounded hover:bg-white hover:border-gold border border-transparent transition-all text-xs shadow-lg">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            );
+        }
+
+        function AdminPanel({ orders, setOrders, products, setProducts }) {
+            const [tab, setTab] = useState('orders'); 
+            const [editingProduct, setEditingProduct] = useState(null); 
+
+            const updateOrderStatus = (id, status) => { setOrders(prev => prev.map(o => o.id === id ? { ...o, estatus: status } : o)); };
+            const handleSaveProduct = (prod) => {
+                if (products.find(p => p.id === prod.id)) { setProducts(prev => prev.map(p => p.id === prod.id ? prod : p)); } 
+                else { setProducts(prev => [prod, ...prev]); }
+                setEditingProduct(null);
+            };
+            const handleDeleteProduct = (id) => { if(confirm('¿Eliminar?')) setProducts(prev => prev.filter(p => p.id !== id)); };
+
+            return (
+                <div className="max-w-[1000px] mx-auto px-6 py-12">
+                    <h1 className="text-3xl font-black uppercase mb-8">Panel de <span className="text-gold">Control</span></h1>
+                    <div className="flex gap-8 border-b border-gray-200 mb-8">
+                        <button onClick={() => { setTab('orders'); setEditingProduct(null); }} className={`pb-4 text-sm font-bold uppercase border-b-2 transition-all ${tab === 'orders' ? 'border-gold text-black' : 'border-transparent text-gray-400'}`}>Pedidos</button>
+                        <button onClick={() => { setTab('products'); setEditingProduct(null); }} className={`pb-4 text-sm font-bold uppercase border-b-2 transition-all ${tab === 'products' ? 'border-gold text-black' : 'border-transparent text-gray-400'}`}>Inventario</button>
+                    </div>
+
+                    {tab === 'orders' && (
+                        <div className="bg-white border rounded overflow-hidden shadow-lg">
+                            <table className="w-full text-left text-xs uppercase font-bold"><thead className="bg-black text-white"><tr><th className="p-4">ID</th><th className="p-4">Cliente</th><th className="p-4">Total</th><th className="p-4">Estatus</th></tr></thead><tbody>{orders.map(o => (<tr key={o.id} className="border-b"><td className="p-4 text-gold">{o.id}</td><td className="p-4">{o.cliente}</td><td className="p-4">${o.total}</td><td className="p-4"><select value={o.estatus} onChange={(e)=>updateOrderStatus(o.id, e.target.value)} className="bg-white border p-1 rounded"><option value="pendiente">Pendiente</option><option value="pagado">Pagado</option><option value="enviado">Enviado</option></select></td></tr>))}</tbody></table>
+                        </div>
+                    )}
+
+                    {tab === 'products' && (
+                        <div>
+                            {!editingProduct ? (
+                                <>
+                                    <div className="flex justify-end mb-6"><button onClick={() => setEditingProduct({})} className="flex items-center gap-2 bg-black text-white px-6 py-3 font-bold uppercase text-xs hover:bg-gold hover:text-black transition-all"><Plus size={16} /> Agregar</button></div>
+                                    <div className="bg-white border rounded overflow-hidden shadow-lg"><table className="w-full text-left text-xs uppercase font-bold"><thead className="bg-gray-100 text-black"><tr><th className="p-4">Img</th><th className="p-4">Nombre</th><th className="p-4">Precio</th><th className="p-4">Stock</th><th className="p-4 text-right">Acción</th></tr></thead><tbody>{products.map(p => (<tr key={p.id} className="border-b"><td className="p-4"><img src={p.variantes?.[0]?.img} className="w-10 h-10 object-cover rounded"/></td><td className="p-4">{p.nombre}</td><td className="p-4">${p.precio}</td><td className="p-4 text-gold">{p.stock}</td><td className="p-4 text-right"><div className="flex justify-end gap-2"><button onClick={()=>setEditingProduct(p)} className="p-2 hover:text-gold"><Edit size={16}/></button><button onClick={()=>handleDeleteProduct(p.id)} className="p-2 hover:text-red-500"><Trash size={16}/></button></div></td></tr>))}</tbody></table></div>
+                                </>
+                            ) : (
+                                <ProductForm product={editingProduct.id ? editingProduct : null} onSave={handleSaveProduct} onCancel={() => setEditingProduct(null)} />
+                            )}
+                        </div>
+                    )}
+                </div>
+            )
+        }
+
+        function OrderSuccess({ onHome }) {
+            return <div className="text-center py-20 animate-fade-in"><Check size={64} className="mx-auto text-green-500 mb-4"/><h1 className="text-4xl font-black uppercase">¡Pedido Exitoso!</h1><button onClick={onHome} className="mt-8 border-b-2 border-black font-bold uppercase hover:text-gold hover:border-gold transition-colors">Volver</button></div>
+        }
+
+        function Footer({ onAdminClick }) {
+            return (
+                <footer className="bg-black text-gray-500 py-12 px-6 text-xs font-bold uppercase tracking-widest border-t border-gold text-center">
+                    <p className="mb-4">COOL EYEWEAR © 2026</p>
+                    <button onClick={onAdminClick} className="flex items-center gap-1 mx-auto hover:text-white transition-colors"><Settings size={12}/> Admin Access</button>
+                </footer>
+            )
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
