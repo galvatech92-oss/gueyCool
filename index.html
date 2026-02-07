@@ -54,7 +54,7 @@
         const { useState, useEffect, useMemo } = React;
         
         // --- CONFIGURACIÓN DE CONEXIÓN ---
-        const USE_API = false; 
+        const USE_API = false; // Pon en TRUE cuando tengas el api.php subido
         const API_URL = 'http://localhost/coolstore/api.php'; 
 
         // --- SISTEMA DE ÍCONOS NATIVO ---
@@ -96,10 +96,20 @@
         const CONFIG = { shippingCost: 150, freeShippingThreshold: 1500, wholesaleMinQty: 6 };
         const CATEGORIAS_LIST = ["Gafas y Lentes", "Joyería", "Bolsas y Mochilas", "Calzado"];
 
-        // --- DATOS MOCK (FALLBACK PARA DEMO) ---
+        // --- DATOS MOCK (Catálogo Completo) ---
         const PRODUCTOS_INICIALES = [
-            { id: 101, nombre: "AVIATOR NEON", marca: "RAY-BAN", categoria: "Gafas y Lentes", genero: "Unisex", precio: 2500, precioMayorista: 1800, descuento: 0, stock: 15, descripcion: "El clásico reinventado.", variantes: [{ color: "Dorado", mica: "Verde G-15", img: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=600&q=80" }], tallas: ["ESTÁNDAR", "GRANDE"], tipo: "gafas" },
-            { id: 401, nombre: "AIR FORCE 1 '07", marca: "NIKE", categoria: "Calzado", genero: "Hombre", precio: 2800, precioMayorista: 2200, descuento: 0, stock: 8, descripcion: "Leyenda urbana.", variantes: [{ color: "Blanco", img: "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=600&q=80" }], tallas: ["26", "27", "28", "29"], tipo: "general" }
+            // --- GAFAS ---
+            { id: 101, nombre: "AVIATOR NEON", marca: "RAY-BAN", categoria: "Gafas y Lentes", genero: "Unisex", precio: 2500, precioMayorista: 1800, descuento: 0, stock: 15, descripcion: "El clásico reinventado. Micas de espejo y montura ultra ligera.", variantes: [{ color: "Dorado", mica: "Verde G-15", img: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=600&q=80" }, { color: "Negro", mica: "Oscura", img: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=600&q=80" }], tallas: ["ESTÁNDAR", "GRANDE"], tipo: "gafas" },
+            { id: 102, nombre: "WARWICK VENOM", marca: "HAWKERS", categoria: "Gafas y Lentes", genero: "Unisex", precio: 899, precioMayorista: 600, descuento: 20, stock: 25, descripcion: "Vibras geométricas en acetato de alta calidad.", variantes: [{ color: "Carey", mica: "Café", img: "https://images.unsplash.com/photo-1591076482161-42ce6da69f67?auto=format&fit=crop&w=600&q=80" }, { color: "Negro Mate", mica: "Negro", img: "https://images.unsplash.com/photo-1533519777555-5206305a41d9?auto=format&fit=crop&w=600&q=80" }], tallas: ["Única"], tipo: "gafas" },
+            { id: 103, nombre: "WAYFARER CLASSIC", marca: "RAY-BAN", categoria: "Gafas y Lentes", genero: "Unisex", precio: 3100, precioMayorista: 2600, descuento: 0, stock: 5, descripcion: "El estilo más reconocible en la historia de las gafas de sol.", variantes: [{ color: "Negro", mica: "Verde Clásico", img: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=600&q=80" }], tallas: ["50", "54"], tipo: "gafas" },
+            // --- CALZADO ---
+            { id: 401, nombre: "AIR FORCE 1 '07", marca: "NIKE", categoria: "Calzado", genero: "Hombre", precio: 2800, precioMayorista: 2200, descuento: 0, stock: 8, descripcion: "Leyenda urbana. Comodidad y estilo icónico.", variantes: [{ color: "Blanco", img: "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=600&q=80" }], tallas: ["26", "27", "28", "29"], tipo: "general" },
+            { id: 402, nombre: "OLD SKOOL", marca: "VANS", categoria: "Calzado", genero: "Unisex", precio: 1400, precioMayorista: 950, descuento: 0, stock: 18, descripcion: "El clásico zapato de skate con la banda lateral icónica.", variantes: [{ color: "Negro/Blanco", img: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=600&q=80" }], tallas: ["23", "24", "25", "26", "27", "28"], tipo: "general" },
+            // --- JOYERÍA ---
+            { id: 201, nombre: "COLLAR LUNA", marca: "ATELIER", categoria: "Joyería", genero: "Mujer", precio: 850, precioMayorista: 500, descuento: 0, stock: 20, descripcion: "Plata esterlina .925 con dije de media luna.", variantes: [{ color: "Plata", img: "https://images.unsplash.com/photo-1599643478518-17488fbbcd75?auto=format&fit=crop&w=600&q=80" }], tallas: ["45cm", "50cm"], tipo: "general" },
+            { id: 202, nombre: "PULSERA TRENZADA", marca: "FOSSIL", categoria: "Joyería", genero: "Hombre", precio: 950, precioMayorista: 600, descuento: 15, stock: 10, descripcion: "Cuero genuino trenzado con cierre magnético.", variantes: [{ color: "Café", img: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=600&q=80" }], tallas: ["M", "L"], tipo: "general" },
+            // --- BOLSAS ---
+            { id: 301, nombre: "MOCHILA URBANA", marca: "HERSCHEL", categoria: "Bolsas y Mochilas", genero: "Unisex", precio: 1450, precioMayorista: 1000, descuento: 10, stock: 12, descripcion: "Versatilidad total. Diseño resistente al agua.", variantes: [{ color: "Azul Marino", img: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80" }, { color: "Gris", img: "https://images.unsplash.com/photo-1581605405669-fcdf8116543f?auto=format&fit=crop&w=600&q=80" }], tallas: ["25L"], tipo: "general" }
         ];
 
         // --- APP ---
@@ -111,49 +121,23 @@
             const [notification, setNotification] = useState(null);
             const [activeFilters, setActiveFilters] = useState({ categoria: "Todas", genero: "Todos", precioMax: 10000 });
 
-            // Data State
-            const [carrito, setCarrito] = useState(() => { const s = localStorage.getItem('cart_cool_functional'); return s ? JSON.parse(s) : []; });
-            const [products, setProducts] = useState(() => {
-                 const s = localStorage.getItem('db_products_functional'); 
-                 return s ? JSON.parse(s) : PRODUCTOS_INICIALES;
-            });
-            const [orders, setOrders] = useState(() => {
-                 const s = localStorage.getItem('db_orders_functional');
-                 return s ? JSON.parse(s) : [];
-            });
+            const [carrito, setCarrito] = useState(() => { const s = localStorage.getItem('cart_cool_v4'); return s ? JSON.parse(s) : []; });
+            const [products, setProducts] = useState(() => { const s = localStorage.getItem('db_products_v4'); return s ? JSON.parse(s) : PRODUCTOS_INICIALES; });
+            const [orders, setOrders] = useState(() => { const s = localStorage.getItem('db_orders_v4'); return s ? JSON.parse(s) : []; });
 
-            // INIT DATA
             useEffect(() => {
                 if (USE_API) {
-                    console.log("📡 Conectando a MySQL Backend...");
-                    fetch(`${API_URL}?action=products`)
-                        .then(res => res.json())
-                        .then(data => {
-                            console.log("✅ Productos cargados desde DB:", data.length);
-                            setProducts(data);
-                        })
-                        .catch(err => {
-                            console.error("❌ Error de conexión:", err);
-                            showNotification("Error conectando a BD. Usando modo offline.");
-                        });
-                } else {
-                    console.log("🔌 Modo Local (Offline) Activo");
+                    fetch(`${API_URL}?action=products`).then(res => res.json()).then(data => setProducts(data)).catch(err => console.error("Offline"));
                 }
             }, []);
 
-            // PERSISTENCE (Solo en modo offline/demo)
-            useEffect(() => { if (!USE_API) localStorage.setItem('cart_cool_functional', JSON.stringify(carrito)); }, [carrito]);
-            useEffect(() => { if (!USE_API) localStorage.setItem('db_products_functional', JSON.stringify(products)); }, [products]);
-            useEffect(() => { if (!USE_API) localStorage.setItem('db_orders_functional', JSON.stringify(orders)); }, [orders]);
+            useEffect(() => { if (!USE_API) localStorage.setItem('cart_cool_v4', JSON.stringify(carrito)); }, [carrito]);
+            useEffect(() => { if (!USE_API) localStorage.setItem('db_products_v4', JSON.stringify(products)); }, [products]);
+            useEffect(() => { if (!USE_API) localStorage.setItem('db_orders_v4', JSON.stringify(orders)); }, [orders]);
 
-            const showNotification = (msg) => { 
-                console.log("🔔 Notificación:", msg);
-                setNotification(msg); 
-                setTimeout(() => setNotification(null), 3000); 
-            };
+            const showNotification = (msg) => { setNotification(msg); setTimeout(() => setNotification(null), 3000); };
 
             const addToCart = (product, variante, talla, cantidad) => {
-                console.log(`🛒 Intentando agregar: ${product.nombre} (x${cantidad})`);
                 if (cantidad > product.stock) { showNotification("¡Stock insuficiente!"); return; }
                 setCarrito(prev => {
                     const key = `${product.id}-${variante.color}-${talla}`;
@@ -168,60 +152,30 @@
             };
 
             const handlePlaceOrder = async (orderData) => {
-                console.log("🚀 Iniciando Checkout...", orderData);
-                
                 if (USE_API) {
-                    // --- MODO PRODUCCIÓN (MySQL) ---
                     try {
-                        const res = await fetch(`${API_URL}?action=create_order`, {
-                            method: 'POST',
-                            headers: {'Content-Type': 'application/json'},
-                            body: JSON.stringify({ ...orderData, items: carrito })
-                        });
+                        const res = await fetch(`${API_URL}?action=create_order`, { method: 'POST', body: JSON.stringify({ ...orderData, items: carrito }) });
                         const data = await res.json();
-                        if (data.success) {
-                            setCarrito([]);
-                            showNotification("¡Pedido guardado en MySQL!");
-                            console.log("✅ Pedido MySQL Éxito:", data);
-                            setView('success');
-                        } else {
-                            console.error("❌ Error MySQL:", data.error);
-                            showNotification("Error del servidor: " + data.error);
-                        }
-                    } catch (e) {
-                        console.error("❌ Error Fetch:", e);
-                        showNotification("Error de conexión");
-                    }
+                        if(data.success) { setCarrito([]); showNotification("¡Pedido guardado!"); setView('success'); }
+                    } catch(e) { showNotification("Error de conexión"); }
                 } else {
-                    // --- MODO DEMO (LocalStorage) ---
-                    const newOrder = {
-                        id: `#ORD-${Math.floor(10000 + Math.random() * 90000)}`,
-                        cliente: orderData.shipping.nombre,
-                        total: orderData.total,
-                        estatus: "pendiente",
-                        metodoPago: orderData.paymentMethod,
-                        items: carrito
-                    };
-                    const newProductsState = products.map(prod => {
-                        const itemsInCart = carrito.filter(item => item.id === prod.id);
-                        if (itemsInCart.length > 0) {
-                            const bought = itemsInCart.reduce((s, i) => s + i.cantidad, 0);
-                            return { ...prod, stock: Math.max(0, prod.stock - bought) };
-                        }
-                        return prod;
-                    });
-                    setProducts(newProductsState);
+                    const newOrder = { id: `#ORD-${Math.floor(10000 + Math.random() * 90000)}`, cliente: orderData.shipping.nombre, total: orderData.total, estatus: "pendiente", metodoPago: orderData.paymentMethod };
                     setOrders([newOrder, ...orders]);
+                    setProducts(prev => prev.map(p => {
+                        const inCart = carrito.filter(i => i.id === p.id);
+                        if(inCart.length) {
+                             const bought = inCart.reduce((s, i) => s + i.cantidad, 0);
+                             return {...p, stock: Math.max(0, p.stock - bought)};
+                        }
+                        return p;
+                    }));
                     setCarrito([]);
-                    console.log("💾 Pedido Local Guardado:", newOrder);
-                    showNotification("Pedido guardado (Local)");
                     setView('success');
                 }
             };
 
             return (
                 <div className="min-h-screen flex flex-col selection:bg-gold selection:text-black">
-                    {/* ANNOUNCEMENT */}
                     <div className="bg-black text-gold text-xs font-bold py-2.5 text-center tracking-widest px-4 flex justify-center gap-4">
                         <span>🔥 ENVÍOS GRATIS +$1,500</span> <span>//</span> <span>⚡️ 3 MSI CON TARJETA</span>
                     </div>
@@ -249,7 +203,17 @@
                         </div>
                     </nav>
 
-                    {/* MAIN CONTENT SWITCHER */}
+                    {isMenuOpen && (
+                        <div className="fixed inset-0 z-[60] bg-white p-8 flex flex-col animate-fade-in border-l border-gray-100">
+                            <div className="flex justify-between items-center mb-12"><span className="text-2xl brand-font text-black">MENÚ</span><button onClick={() => setIsMenuOpen(false)} className="text-gray-500 hover:text-black"><X size={32}/></button></div>
+                            <div className="flex flex-col gap-8 text-xl font-bold uppercase tracking-widest text-black">
+                                {CATEGORIAS_LIST.map(cat => (
+                                <button key={cat} onClick={() => { setActiveFilters({...activeFilters, categoria: cat}); setView('home'); setIsMenuOpen(false); }} className="text-left hover:text-gold transition-colors border-b border-gray-100 pb-4">{cat}</button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     <main className="flex-1 w-full bg-white">
                         {view === 'home' && (
                             <>
@@ -259,6 +223,16 @@
                                         <FiltersSidebar activeFilters={activeFilters} setActiveFilters={setActiveFilters} />
                                     </aside>
                                     <div className="flex-1">
+                                        {/* Mobile Tags */}
+                                        <div className="md:hidden mb-8 overflow-x-auto pb-2 scrollbar-hide">
+                                            <div className="flex gap-3">
+                                            {CATEGORIAS_LIST.map(cat => (
+                                                <button key={cat} onClick={() => setActiveFilters({...activeFilters, categoria: cat})} className={`px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest border transition-all whitespace-nowrap ${activeFilters.categoria === cat ? 'bg-black text-white border-black' : 'bg-white text-gray-500 border-gray-200'}`}>
+                                                {cat}
+                                                </button>
+                                            ))}
+                                            </div>
+                                        </div>
                                         <ProductGrid products={products} filters={activeFilters} onProductClick={(p) => { setSelectedProduct(p); setView('detail'); window.scrollTo(0,0); }} />
                                     </div>
                                 </div>
@@ -268,7 +242,7 @@
                         {view === 'cart' && <CartPage cart={carrito} setCarrito={setCarrito} onCheckout={() => setView('checkout')} onContinue={() => setView('home')} />}
                         {view === 'checkout' && <CheckoutFlow cart={carrito} onBack={() => setView('cart')} onPlaceOrder={handlePlaceOrder} />}
                         {view === 'success' && <OrderSuccess onHome={() => setView('home')} />}
-                        {view === 'admin' && (isAdminAuthenticated ? <AdminPanel orders={orders} setOrders={setOrders} products={products} setProducts={setProducts} /> : <LoginAdmin onLoginSuccess={() => { console.log("🔑 Admin Logged In"); setIsAdminAuthenticated(true); }} />)}
+                        {view === 'admin' && (isAdminAuthenticated ? <AdminPanel orders={orders} setOrders={setOrders} products={products} setProducts={setProducts} /> : <LoginAdmin onLoginSuccess={() => setIsAdminAuthenticated(true)} />)}
                     </main>
 
                     <Footer onAdminClick={() => setView('admin')} />
@@ -278,11 +252,11 @@
             );
         }
 
-        // --- SUB COMPONENTS (Simplificados visualmente, lógica intacta) ---
+        // --- SUB COMPONENTS ---
         function HeroSection() {
             return (
                 <div className="relative w-full h-[70vh] bg-gray-50 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1920&q=80" className="absolute inset-0 w-full h-full object-cover" alt="Hero" />
+                    <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1920&q=80" className="absolute inset-0 w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-white/10 mix-blend-overlay"></div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
                     <div className="absolute inset-0 flex flex-col justify-center items-center text-center p-6 z-10">
@@ -313,17 +287,28 @@
         function ProductGrid({ products, filters, onProductClick }) {
             const filtered = products.filter(p => (filters.categoria === "Todas" || p.categoria === filters.categoria) && (filters.genero === "Todos" || p.genero === filters.genero));
             if (filtered.length === 0) return <div className="text-center py-20 text-gray-400 font-bold uppercase tracking-widest text-xs">No hay resultados.</div>;
-            return <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-16">{filtered.map(p => <ProductCard key={p.id} product={p} onClick={onProductClick} />)}</div>;
+            // CHANGE: grid-cols-1 for mobile (Reel Mode)
+            return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">{filtered.map(p => <ProductCard key={p.id} product={p} onClick={onProductClick} />)}</div>;
         }
 
         function ProductCard({ product, onClick }) {
             const [idx, setIdx] = useState(0);
-            const img = product.variantes && product.variantes[idx] ? product.variantes[idx].img : 'https://via.placeholder.com/300';
+            const variants = product.variantes || [];
+            const img = variants.length > 0 && variants[idx] ? variants[idx].img : 'https://via.placeholder.com/300';
+
             return (
                 <div className="group flex flex-col cursor-pointer" onClick={() => onClick(product)}>
                     <div className="relative aspect-[3/4] bg-[#F5F5F5] mb-5 overflow-hidden group-hover:border-gold border border-transparent transition-all">
                         <img src={img} className="w-full h-full object-cover mix-blend-multiply opacity-90 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"/>
                         {product.stock===0 && <div className="absolute inset-0 bg-white/80 flex items-center justify-center"><span className="text-black border-2 border-black px-4 py-2 text-xs font-bold uppercase tracking-[0.2em]">Agotado</span></div>}
+                    </div>
+                    {/* MINIATURAS FOTO CUADRADA */}
+                    <div className="flex gap-2 mb-3 overflow-x-auto no-scrollbar pb-1 justify-center md:justify-start">
+                        {variants.map((v, i) => (
+                            <button key={i} onMouseEnter={(e) => { e.stopPropagation(); setIdx(i); }} onClick={(e) => { e.stopPropagation(); setIdx(i); }} className={`w-10 h-10 rounded border overflow-hidden transition-all flex-shrink-0 ${idx===i ? 'border-gold scale-110 ring-1 ring-gold' : 'border-gray-200 hover:border-black opacity-70 hover:opacity-100'}`}>
+                                <img src={v.img} className="w-full h-full object-cover"/>
+                            </button>
+                        ))}
                     </div>
                     <h3 className="text-black text-sm font-bold uppercase tracking-[0.05em] mb-1 group-hover:text-gold transition-colors brand-font">{product.nombre}</h3>
                     <p className="text-[10px] text-gray-400 mb-2 uppercase tracking-widest font-bold">{product.marca}</p>
@@ -334,7 +319,10 @@
 
         function ProductDetail({ product, onBack, onAddToCart }) {
             const [idx, setIdx] = useState(0);
-            const variant = product.variantes ? product.variantes[idx] : { img: '', color: '' };
+            const variant = product.variantes && product.variantes.length > 0 ? product.variantes[idx] : { img: '', color: '' };
+            const tallas = product.tallas || [];
+            const [talla, setTalla] = useState(tallas[0] || '');
+
             return (
                 <div className="max-w-[1000px] mx-auto px-6 py-12 grid md:grid-cols-2 gap-12 animate-fade-in">
                     <div className="aspect-[3/4] bg-[#F5F5F5]"><img src={variant.img} className="w-full h-full object-cover mix-blend-multiply"/></div>
@@ -345,13 +333,26 @@
                         <p className="text-gray-500 mb-8">{product.descripcion}</p>
                         <div className="mb-8">
                             <label className="text-xs font-bold uppercase block mb-2">Color: {variant.color}</label>
-                            <div className="flex gap-2">
+                            {/* MINIATURAS EN DETALLE TAMBIÉN CUADRADAS */}
+                            <div className="flex gap-2 mb-6 flex-wrap">
                                 {product.variantes && product.variantes.map((v, i) => (
-                                    <button key={i} onClick={()=>setIdx(i)} className={`w-12 h-12 border ${idx===i?'border-gold':'border-gray-200'}`}><img src={v.img} className="w-full h-full object-cover"/></button>
+                                    <button key={i} onClick={()=>setIdx(i)} className={`w-16 h-16 border overflow-hidden transition-all p-0.5 ${idx===i?'border-gold ring-1 ring-gold':'border-gray-200 hover:border-black'}`}>
+                                        <img src={v.img} className="w-full h-full object-cover"/>
+                                    </button>
                                 ))}
                             </div>
+                            {tallas.length > 0 && (
+                                <>
+                                    <label className="text-xs font-bold uppercase block mb-2">Talla</label>
+                                    <div className="flex gap-2">
+                                        {tallas.map(t => (
+                                            <button key={t} onClick={()=>setTalla(t)} className={`px-4 py-2 border text-xs font-bold ${t===talla ? 'bg-black text-white' : 'hover:border-black'}`}>{t}</button>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
                         </div>
-                        <button onClick={()=>onAddToCart(product, variant, "STD", 1)} disabled={product.stock===0} className="w-full bg-gold text-black font-bold py-4 hover:bg-black hover:text-white transition-colors uppercase disabled:bg-gray-300">
+                        <button onClick={()=>onAddToCart(product, variant, talla, 1)} disabled={product.stock===0} className="w-full bg-gold text-black font-bold py-4 hover:bg-black hover:text-white transition-colors uppercase disabled:bg-gray-300">
                             {product.stock===0 ? "Agotado" : "Agregar al Carrito"}
                         </button>
                     </div>
@@ -427,15 +428,19 @@
         function ProductForm({ product, onSave, onCancel }) {
             const [formData, setFormData] = useState({
                 nombre: '', marca: '', categoria: CATEGORIAS_LIST[0], genero: 'Unisex',
-                precio: 0, stock: 0, descripcion: '', imagen: '', color: '', tallas: ''
+                precio: 0, stock: 0, descripcion: '', 
+                variantes: [], // Array de { color, img }
+                tallas: ''
             });
+
+            // State temporal para agregar una variante nueva
+            const [newVar, setNewVar] = useState({ color: '', img: '' });
 
             useEffect(() => {
                 if (product) {
                     setFormData({
                         ...product,
-                        imagen: product.variantes && product.variantes.length > 0 ? product.variantes[0].img : '',
-                        color: product.variantes && product.variantes.length > 0 ? product.variantes[0].color : '',
+                        variantes: product.variantes || [],
                         tallas: product.tallas ? product.tallas.join(', ') : ''
                     });
                 }
@@ -444,22 +449,33 @@
             const handleImageUpload = (e) => {
                 const file = e.target.files[0];
                 if (file) {
-                    console.log("📤 Subiendo imagen:", file.name);
                     const reader = new FileReader();
-                    reader.onloadend = () => {
-                        setFormData(prev => ({ ...prev, imagen: reader.result }));
-                    };
+                    reader.onloadend = () => setNewVar(prev => ({ ...prev, img: reader.result }));
                     reader.readAsDataURL(file);
                 }
             };
 
+            const addVariant = () => {
+                if(newVar.color && newVar.img) {
+                    setFormData(prev => ({...prev, variantes: [...prev.variantes, newVar]}));
+                    setNewVar({ color: '', img: '' }); 
+                } else {
+                    alert("Sube una foto y ponle nombre al color");
+                }
+            };
+
+            const removeVariant = (idx) => {
+                setFormData(prev => ({...prev, variantes: prev.variantes.filter((_, i) => i !== idx)}));
+            };
+
             const handleSubmit = (e) => {
                 e.preventDefault();
+                if(formData.variantes.length === 0) { alert("Agrega al menos una variante de color/foto"); return; }
+                
                 const newProduct = {
                     ...product, ...formData,
                     id: product ? product.id : Date.now(),
                     tallas: formData.tallas.split(',').map(t => t.trim()),
-                    variantes: [{ color: formData.color, img: formData.imagen }] 
                 };
                 onSave(newProduct);
             };
@@ -479,21 +495,46 @@
                         </div>
                         <textarea placeholder="Descripción" value={formData.descripcion} onChange={e=>setFormData({...formData, descripcion: e.target.value})} className="border p-2 rounded w-full h-24"></textarea>
                         
+                        {/* SECCIÓN VARIANTES MULTIPLES */}
                         <div className="bg-gray-50 p-4 rounded border border-gray-100">
-                            <label className="block text-xs font-bold text-gold uppercase mb-2">Imagen Principal</label>
-                            <div className="flex items-center gap-4">
-                                <label className="cursor-pointer bg-white border border-gray-300 px-4 py-2 rounded text-xs font-bold uppercase hover:border-gold hover:text-gold transition-colors flex items-center gap-2">
-                                    <Image size={16}/> Subir Foto
-                                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                                </label>
-                                {formData.imagen ? <img src={formData.imagen} className="w-12 h-12 object-cover rounded border"/> : <span className="text-xs text-gray-400">Sin foto</span>}
+                            <h3 className="font-bold text-sm uppercase mb-4 text-gold">Variantes de Color (Mínimo 1)</h3>
+                            
+                            <div className="flex gap-4 mb-4 overflow-x-auto pb-2">
+                                {formData.variantes.map((v, i) => (
+                                    <div key={i} className="relative w-20 h-24 border bg-white flex-shrink-0 group">
+                                        <img src={v.img} className="w-full h-16 object-cover"/>
+                                        <div className="text-[10px] text-center p-1 font-bold truncate">{v.color}</div>
+                                        <button type="button" onClick={() => removeVariant(i)} className="absolute top-0 right-0 bg-red-500 text-white p-1 opacity-0 group-hover:opacity-100"><X size={12}/></button>
+                                    </div>
+                                ))}
                             </div>
-                            <input placeholder="Color Principal (Ej: Negro)" value={formData.color} onChange={e=>setFormData({...formData, color: e.target.value})} className="border p-2 rounded w-full mt-3" />
+
+                            <div className="flex items-end gap-4 border-t pt-4">
+                                <div>
+                                    <label className="block text-[10px] font-bold uppercase mb-1">1. Sube Foto</label>
+                                    <label className="cursor-pointer bg-white border border-gray-300 px-3 py-2 rounded text-xs font-bold uppercase flex items-center gap-2 hover:border-black">
+                                        <Image size={14}/> {newVar.img ? 'Foto Lista' : 'Elegir'}
+                                        <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                    </label>
+                                </div>
+                                <div className="flex-1">
+                                    <label className="block text-[10px] font-bold uppercase mb-1">2. Nombre Color</label>
+                                    <input placeholder="Ej: Negro Mate" value={newVar.color} onChange={e=>setNewVar({...newVar, color: e.target.value})} className="border p-2 rounded w-full text-xs" />
+                                </div>
+                                <button type="button" onClick={addVariant} className="bg-black text-white px-4 py-2 rounded text-xs font-bold uppercase hover:bg-gold hover:text-black">
+                                    + Agregar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="mt-4">
+                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Tallas Disponibles</label>
+                            <input placeholder="Separadas por coma (Ej: CH, M, G)" value={formData.tallas} onChange={e=>setFormData({...formData, tallas: e.target.value})} className="border p-2 rounded w-full" />
                         </div>
 
                         <div className="flex gap-4 pt-4">
                             <button type="button" onClick={onCancel} className="flex-1 py-3 border border-gray-300 font-bold uppercase rounded hover:bg-gray-100 text-xs">Cancelar</button>
-                            <button type="submit" className="flex-1 py-3 bg-gold text-black font-bold uppercase rounded hover:bg-white hover:border-gold border border-transparent transition-all text-xs shadow-lg">Guardar</button>
+                            <button type="submit" className="flex-1 py-3 bg-gold text-black font-bold uppercase rounded hover:bg-white hover:border-gold border border-transparent transition-all text-xs shadow-lg">Guardar Producto</button>
                         </div>
                     </form>
                 </div>
@@ -503,7 +544,6 @@
         function AdminPanel({ orders, setOrders, products, setProducts }) {
             const [tab, setTab] = useState('orders'); 
             const [editingProduct, setEditingProduct] = useState(null); 
-
             const updateOrderStatus = (id, status) => { setOrders(prev => prev.map(o => o.id === id ? { ...o, estatus: status } : o)); };
             const handleSaveProduct = (prod) => {
                 if (products.find(p => p.id === prod.id)) { setProducts(prev => prev.map(p => p.id === prod.id ? prod : p)); } 
@@ -525,7 +565,6 @@
                             <table className="w-full text-left text-xs uppercase font-bold"><thead className="bg-black text-white"><tr><th className="p-4">ID</th><th className="p-4">Cliente</th><th className="p-4">Total</th><th className="p-4">Estatus</th></tr></thead><tbody>{orders.map(o => (<tr key={o.id} className="border-b"><td className="p-4 text-gold">{o.id}</td><td className="p-4">{o.cliente}</td><td className="p-4">${o.total}</td><td className="p-4"><select value={o.estatus} onChange={(e)=>updateOrderStatus(o.id, e.target.value)} className="bg-white border p-1 rounded"><option value="pendiente">Pendiente</option><option value="pagado">Pagado</option><option value="enviado">Enviado</option></select></td></tr>))}</tbody></table>
                         </div>
                     )}
-
                     {tab === 'products' && (
                         <div>
                             {!editingProduct ? (
